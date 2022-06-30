@@ -39,8 +39,8 @@ const manufacturer_make_order = async (req,res)=>{
     const quantity = (req.body.quantity).toString();
     const d = (req.body.orderdate).toString();
    
-    const orderhash = await deploying.methods.create_order(part,exdelidate,d,quantity).call({from:'0x7F9282Ab1c11CE380aF1D8F142eE263BF4b1eA85',gas:3000000});
-    const orderhash2 = await deploying.methods.create_order(part,exdelidate,d,quantity).send({from:'0x7F9282Ab1c11CE380aF1D8F142eE263BF4b1eA85',gas:3000000});
+    const orderhash = await deploying.methods.create_order(part,exdelidate,d,quantity).call({from:'0xF719F3Fe9F430eCF03dB11E5a3f64817c89AEaE5',gas:3000000});
+    const orderhash2 = await deploying.methods.create_order(part,exdelidate,d,quantity).send({from:'0xF719F3Fe9F430eCF03dB11E5a3f64817c89AEaE5',gas:3000000});
      array.push(orderhash);
     
     res.send(orderhash);
@@ -59,9 +59,10 @@ const payment = async(req,res)=>{
     const x = await deploying.methods.getparts(reciver,order).send({from:'0x8a6f56963aB0E9b682585Ffb52DD3492A8Fa583E'});
     res.send(x);
 }
-const get_orderlist = (req,res)=>{
-    console.log(array[0]);
-       res.render('extra',{newListItems:array})
+const get_orderlist = async (req,res)=>{
+    const orderdetail = await deploying.methods.accept_order().call();
+
+       res.render('extra',{newListItems:orderdetail})
 }
 
 const supplier_getorder = async (req,res)=>{
@@ -70,7 +71,7 @@ const supplier_getorder = async (req,res)=>{
     console.log(oid);
      const orderdetail = await deploying.methods.view_order(oid).call();
      
-     res.send(`<h3>manufacturer : ${orderdetail[0]}  <br>Part type : ${orderdetail[1]} <br>  :Delivered on : ${orderdetail[2]} <br> OrderDate : ${orderdetail[3]} <br> Quantity : ${orderdetail[4]} </h3>` );
+     res.send(`<h3>manufacturer : ${orderdetail[0]}  <br>Part type : ${orderdetail[1]} <br>  :Delivered on : ${orderdetail[2]} <br> OrderDate : ${orderdetail[3]} <br> Quantity : ${orderdetail[4]} <br>Time: ${orderdetail[5]}</h3>` );
  }
 
  const supplier_accept_order = async (req,res)=>{
@@ -82,12 +83,16 @@ const supplier_build_part = async (req,res)=>{
    const order = (req.body.orderid).toString();
    const serial = (req.body.srno).toString();
    const price = (req.body.price).toString();
-   const mfg_date = (req.body.mfgdate).toString()
-    const hash = await deploying.methods.make_part(order,mfg_date,serial,price).call({from:'0x88d431A67dBA450835c1dcA1F7C9B01eF8223D3f',gas:300000});
-    const hash1 = await deploying.methods.make_part(order,mfg_date,serial,price).send({from:'0x88d431A67dBA450835c1dcA1F7C9B01eF8223D3f',gas:300000});
-    const ownership = await deploying2.methods.add_ownership(0,hash.toString()).send({from:'0x88d431A67dBA450835c1dcA1F7C9B01eF8223D3f'});
-    const recepit= await deploying.methods.partrecepit(order,hash.toString()).send({from:'0x88d431A67dBA450835c1dcA1F7C9B01eF8223D3f',gas:300000});
-    const recepit2= await deploying.methods.partrecepit(order,hash.toString()).call({from:'0x88d431A67dBA450835c1dcA1F7C9B01eF8223D3f',gas:300000});
+   const mfg_date = (req.body.mfgdate).toString();
+   console.log(order ,
+    serial,
+    price ,
+    mfg_date);
+    const hash = await deploying.methods.make_part(order,mfg_date,serial,price).call({from:'0xF719F3Fe9F430eCF03dB11E5a3f64817c89AEaE5',gas:300000});
+    const hash1 = await deploying.methods.make_part(order,mfg_date,serial,price).send({from:'0xF719F3Fe9F430eCF03dB11E5a3f64817c89AEaE5',gas:300000});
+    const ownership = await deploying2.methods.add_ownership(0,hash.toString()).send({from:'0xF719F3Fe9F430eCF03dB11E5a3f64817c89AEaE5'});
+    const recepit= await deploying.methods.partrecepit(order,hash.toString()).send({from:'0xF719F3Fe9F430eCF03dB11E5a3f64817c89AEaE5',gas:300000});
+    const recepit2= await deploying.methods.partrecepit(order,hash.toString()).call({from:'0xF719F3Fe9F430eCF03dB11E5a3f64817c89AEaE5',gas:300000});
     res.send(recepit);
    
 }

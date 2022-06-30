@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.5.22 <0.9.0;
+pragma solidity >=0.5.22 <=0.9.0;
 
 contract Supply_Chain {
-    
-   
+    bytes32[] public  arr;
+  enum  State   {NOTVIEWED,ACCEPTED,DECLINED,PENDING}
     struct Order {
         address manufactureradd;
         string part_type;
         string deliverOn;
         string orderdate;
         string quantity;
+        uint time;
+        State state;
         
     }
 
@@ -98,6 +100,7 @@ contract Supply_Chain {
         string memory quantity
         
     ) public returns (bytes32) {
+        State state = State.NOTVIEWED;
         bytes32 order_hash = INFO_AND_HASH(
             msg.sender,
             part_type,
@@ -109,23 +112,28 @@ contract Supply_Chain {
            part_type,
            deliverOn,
            orderdate,
-           quantity
+           quantity,
+           block.timestamp/3600,
+           state
            
        );
 
         order[order_hash] = new_order;
+        arr.push(order_hash);
          return order_hash;
     }
 
-    function view_order(bytes32 orderhash) public view returns (Order memory) {
+    function view_order(bytes32 orderhash) public  returns (Order memory) {
+        State s= State.ACCEPTED;
+        order[orderhash].state=s;
         return order[orderhash];
     }
 
     //accepting the order
 
-    function accept_order(bytes32 orderhash) pure public returns (bool) {
+    function accept_order() view public returns (bytes32[] memory) {
        
-        return true;
+        return arr;
     }
 
     //making part after order recivied
@@ -135,7 +143,7 @@ contract Supply_Chain {
         string memory serialno,
         uint256 price
     ) public returns (bytes32 partHash) {
-      
+            int[] storage  arr;
         bytes32 part_hash = INFO_AND_HASH(
             msg.sender,
             order[orderhash].part_type,
